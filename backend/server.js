@@ -19,7 +19,7 @@ const app = express()
 
 app.use(
   cors({
-    origin: "*",
+    origin: "https://shahi-darbar-six.vercel.app/",
     credentials: true,
   })
 )
