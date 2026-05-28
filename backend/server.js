@@ -1,11 +1,17 @@
+import dotenv from "dotenv"
+dotenv.config()
+
+
 import express from "express"
 import cors from "cors"
-import dotenv from "dotenv"
+
 
 import connectDB from "./config/db.js"
 import productRoutes from "./routes/productRoutes.js"
-
-dotenv.config()
+import authRoutes from "./routes/authRoutes.js"
+import uploadRoutes from "./routes/uploadRoutes.js"
+import orderRoutes from "./routes/orderRoutes.js"
+import paymentRoutes from "./routes/paymentRoutes.js"
 
 connectDB()
 
@@ -15,6 +21,12 @@ app.use(cors())
 app.use(express.json())
 
 app.use("/api/products", productRoutes)
+
+app.use("/api/auth", authRoutes)
+app.use("/api/upload", uploadRoutes)
+app.use("/api/orders", orderRoutes)
+app.use("/api/payment", paymentRoutes)
+
 
 app.get("/", (req, res) => {
   res.send("ShahiDarbar API Running")

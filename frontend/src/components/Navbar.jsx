@@ -1,115 +1,619 @@
-import { Link } from "react-router-dom"
-import { useState } from "react"
+import {
+  Link,
+  useNavigate,
+} from "react-router-dom"
 
-import { FaBars, FaTimes } from "react-icons/fa"
+import {
+  useEffect,
+  useState,
+} from "react"
+
+import axios from "axios"
+
+import {
+  Menu,
+  X,
+} from "lucide-react"
+
+import { useCart } from "../context/CartContext"
+
+import { useWishlist } from "../context/WishlistContext"
 
 function Navbar() {
 
-  const [menuOpen, setMenuOpen] = useState(false)
+  const navigate = useNavigate()
+
+  /* STATES */
+
+  const [products, setProducts] =
+    useState([])
+
+  const [search, setSearch] =
+    useState("")
+
+  const [filteredProducts,
+    setFilteredProducts] =
+    useState([])
+
+  const [mobileMenu,
+    setMobileMenu] =
+    useState(false)
+
+  const { cartCount } = useCart()
+
+  const { wishlistCount } =
+    useWishlist()
+
+  /* USER */
+
+  const userInfo = JSON.parse(
+    localStorage.getItem("userInfo")
+  )
+
+  /* LOGOUT */
+
+  const logoutHandler = () => {
+
+    localStorage.removeItem("userInfo")
+
+    navigate("/login")
+
+  }
+
+  /* FETCH PRODUCTS */
+
+  useEffect(() => {
+
+    const fetchProducts = async () => {
+
+      try {
+
+        const { data } = await axios.get(
+          `${import.meta.env.VITE_API_URL}/api/products`
+        )
+
+        setProducts(
+          Array.isArray(data)
+            ? data
+            : []
+        )
+
+      } catch (error) {
+
+        console.log(error)
+
+      }
+
+    }
+
+    fetchProducts()
+
+  }, [])
+
+  /* SEARCH FILTER */
+
+  useEffect(() => {
+
+    if (search.trim() === "") {
+
+      setFilteredProducts([])
+
+    }
+
+    else {
+
+      const filtered = products.filter(
+        (product) =>
+
+          product.name
+            .toLowerCase()
+            .includes(search.toLowerCase())
+
+      )
+
+      setFilteredProducts(
+        filtered.slice(0, 5)
+      )
+
+    }
+
+  }, [search, products])
 
   return (
 
-    <nav className="bg-white shadow-md px-8 py-4">
+    <nav className="bg-white shadow-md border-b sticky top-0 z-50">
 
-      <div className="flex justify-between items-center">
+      <div
+        className="
+          max-w-7xl mx-auto
+          px-4 md:px-6 py-4
+        "
+      >
 
-        {/* Logo */}
+        {/* TOP BAR */}
 
-        <h1 className="text-3xl font-bold text-green-700">
-          ShahiDarbar
-        </h1>
+        <div
+          className="
+            flex justify-between
+            items-center gap-4
+          "
+        >
 
-        {/* Desktop Menu */}
+          {/* LOGO */}
 
-        <ul className="hidden md:flex gap-8 font-medium text-gray-700">
+          <Link
+            to="/"
+            className="
+              text-2xl md:text-4xl
+              font-extrabold
+              text-green-700
+            "
+          >
 
-          <Link to="/">
-            <li className="hover:text-green-600 cursor-pointer">
+            ShahiDarbar
+
+          </Link>
+
+          {/* DESKTOP SEARCH */}
+
+          <div
+            className="
+              hidden md:block
+              relative
+            "
+          >
+
+            <input
+              type="text"
+              placeholder="Search products..."
+              value={search}
+              onChange={(e) =>
+                setSearch(e.target.value)
+              }
+              className="
+                border px-4 py-2
+                rounded-xl
+                outline-none
+                w-72
+              "
+            />
+
+            {/* SEARCH DROPDOWN */}
+
+            {filteredProducts.length > 0 && (
+
+              <div
+                className="
+                  absolute top-14 left-0
+                  bg-white shadow-2xl
+                  rounded-2xl w-full
+                  overflow-hidden z-50
+                "
+              >
+
+                {filteredProducts.map((product) => (
+
+                  <Link
+                    key={product._id}
+                    to={`/product/${product._id}`}
+                    onClick={() => {
+
+                      setSearch("")
+
+                      setFilteredProducts([])
+
+                    }}
+                    className="
+                      flex items-center gap-4
+                      p-4 hover:bg-gray-100
+                      transition border-b
+                    "
+                  >
+
+                    <img
+                      src={product.image}
+                      alt={product.name}
+                      className="
+                        w-14 h-14
+                        object-cover
+                        rounded-lg
+                      "
+                    />
+
+                    <div>
+
+                      <h3 className="font-bold">
+
+                        {product.name}
+
+                      </h3>
+
+                      <p
+                        className="
+                          text-green-700
+                          font-semibold
+                        "
+                      >
+
+                        ₹{product.price}
+
+                      </p>
+
+                    </div>
+
+                  </Link>
+
+                ))}
+
+              </div>
+
+            )}
+
+          </div>
+
+          {/* DESKTOP MENU */}
+
+          <div
+            className="
+              hidden md:flex
+              items-center gap-8
+              text-lg font-semibold
+            "
+          >
+
+            <Link
+              to="/"
+              className="
+                hover:text-green-700
+                transition
+              "
+            >
+
               Home
-            </li>
-          </Link>
 
-          <Link to="/products">
-            <li className="hover:text-green-600 cursor-pointer">
+            </Link>
+
+            <Link
+              to="/products"
+              className="
+                hover:text-green-700
+                transition
+              "
+            >
+
               Products
-            </li>
-          </Link>
 
-          <li className="hover:text-green-600 cursor-pointer">
-            Wholesale
-          </li>
+            </Link>
 
-          <li className="hover:text-green-600 cursor-pointer">
-            About
-          </li>
+            {/* WISHLIST */}
 
-        </ul>
+            <Link
+              to="/wishlist"
+              className="
+                relative
+                hover:text-red-500
+                transition
+              "
+            >
 
-        {/* Desktop Buttons */}
+              ❤️
 
-        <div className="hidden md:flex gap-4">
+              {wishlistCount > 0 && (
 
-          <button className="border border-green-600 text-green-700 px-4 py-2 rounded-lg hover:bg-green-50">
-            Login
-          </button>
+                <span
+                  className="
+                    absolute
+                    -top-3
+                    -right-5
+                    bg-red-500
+                    text-white
+                    text-xs
+                    font-bold
+                    px-2 py-1
+                    rounded-full
+                    animate-pulse
+                  "
+                >
 
-          <Link to="/cart">
-            <button className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
+                  {wishlistCount}
+
+                </span>
+
+              )}
+
+            </Link>
+
+            {/* CART */}
+
+            <Link
+              to="/cart"
+              className="
+                relative
+                hover:text-green-700
+                transition
+              "
+            >
+
               Cart
-            </button>
-          </Link>
+
+              {cartCount > 0 && (
+
+                <span
+                  className="
+                    absolute
+                    -top-3
+                    -right-5
+                    bg-red-500
+                    text-white
+                    text-xs
+                    font-bold
+                    px-2 py-1
+                    rounded-full
+                    animate-bounce
+                  "
+                >
+
+                  {cartCount}
+
+                </span>
+
+              )}
+
+            </Link>
+
+            {/* ADMIN */}
+
+            {userInfo?.isAdmin && (
+
+              <Link
+                to="/admin"
+                className="
+                  hover:text-green-700
+                  transition
+                "
+              >
+
+                Admin
+
+              </Link>
+
+            )}
+
+            {/* AUTH */}
+
+            {userInfo ? (
+
+              <div
+                className="
+                  flex items-center gap-5
+                "
+              >
+
+                <span
+                  className="
+                    text-green-700
+                    font-bold
+                  "
+                >
+
+                  {userInfo.name}
+
+                </span>
+
+                <button
+                  onClick={logoutHandler}
+                  className="
+                    bg-red-500 text-white
+                    px-5 py-2 rounded-xl
+                    hover:bg-red-600
+                    transition
+                  "
+                >
+
+                  Logout
+
+                </button>
+
+              </div>
+
+            ) : (
+
+              <div
+                className="
+                  flex items-center gap-5
+                "
+              >
+
+                <Link
+                  to="/login"
+                  className="
+                    hover:text-green-700
+                    transition
+                  "
+                >
+
+                  Login
+
+                </Link>
+
+                <Link
+                  to="/register"
+                  className="
+                    bg-green-600 text-white
+                    px-5 py-2 rounded-xl
+                    hover:bg-green-700
+                    transition
+                  "
+                >
+
+                  Register
+
+                </Link>
+
+              </div>
+
+            )}
+
+          </div>
+
+          {/* MOBILE MENU BUTTON */}
+
+          <button
+            onClick={() =>
+              setMobileMenu(!mobileMenu)
+            }
+            className="md:hidden"
+          >
+
+            {mobileMenu
+              ? <X size={32} />
+              : <Menu size={32} />}
+
+          </button>
 
         </div>
 
-        {/* Mobile Menu Button */}
+        {/* MOBILE MENU */}
 
-        <button
-          className="md:hidden text-2xl text-green-700"
-          onClick={() => setMenuOpen(!menuOpen)}
-        >
+        {mobileMenu && (
 
-          {menuOpen ? <FaTimes /> : <FaBars />}
+          <div
+            className="
+              md:hidden mt-6
+              flex flex-col gap-5
+              text-lg font-semibold
+            "
+          >
 
-        </button>
+            {/* MOBILE SEARCH */}
 
-      </div>
+            <div className="relative">
 
-      {/* Mobile Menu */}
-
-      {
-
-        menuOpen && (
-
-          <div className="md:hidden mt-6 flex flex-col gap-5 text-lg font-medium text-gray-700">
-
-            <Link to="/">
-              <p>Home</p>
-            </Link>
-
-            <Link to="/products">
-              <p>Products</p>
-            </Link>
-
-            <p>Wholesale</p>
-
-            <div className="flex gap-4 mt-2">
-
-              <button className="flex-1 border border-green-600 text-green-700 px-4 py-3 rounded-lg hover:bg-green-50">
-                Login
-              </button>
-
-              <Link to="/cart" className="flex-1">
-                <button className="w-full bg-green-600 text-white px-4 py-3 rounded-lg hover:bg-green-700">
-                  Cart
-                </button>
-              </Link>
+              <input
+                type="text"
+                placeholder="Search..."
+                value={search}
+                onChange={(e) =>
+                  setSearch(e.target.value)
+                }
+                className="
+                  border px-4 py-3
+                  rounded-xl
+                  outline-none
+                  w-full
+                "
+              />
 
             </div>
+
+            <Link
+              to="/"
+              onClick={() =>
+                setMobileMenu(false)
+              }
+            >
+
+              Home
+
+            </Link>
+
+            <Link
+              to="/products"
+              onClick={() =>
+                setMobileMenu(false)
+              }
+            >
+
+              Products
+
+            </Link>
+
+            <Link
+              to="/wishlist"
+              onClick={() =>
+                setMobileMenu(false)
+              }
+            >
+
+              Wishlist ❤️ ({wishlistCount})
+
+            </Link>
+
+            <Link
+              to="/cart"
+              onClick={() =>
+                setMobileMenu(false)
+              }
+            >
+
+              Cart ({cartCount})
+
+            </Link>
+
+            {userInfo?.isAdmin && (
+
+              <Link
+                to="/admin"
+                onClick={() =>
+                  setMobileMenu(false)
+                }
+              >
+
+                Admin
+
+              </Link>
+
+            )}
+
+            {userInfo ? (
+
+              <button
+                onClick={logoutHandler}
+                className="
+                  bg-red-500 text-white
+                  py-3 rounded-xl
+                "
+              >
+
+                Logout
+
+              </button>
+
+            ) : (
+
+              <div className="flex gap-4">
+
+                <Link
+                  to="/login"
+                  onClick={() =>
+                    setMobileMenu(false)
+                  }
+                >
+
+                  Login
+
+                </Link>
+
+                <Link
+                  to="/register"
+                  onClick={() =>
+                    setMobileMenu(false)
+                  }
+                >
+
+                  Register
+
+                </Link>
+
+              </div>
+
+            )}
+
           </div>
 
-        )
+        )}
 
-      }
+      </div>
 
     </nav>
 

@@ -37,7 +37,7 @@ function Footer() {
             </h2>
   
             <p className="text-green-100">
-              Gurgaon, Haryana
+              Hata Bazar, Shivpur, Gorakhpur
             </p>
   
             <p className="text-green-100 mt-2">

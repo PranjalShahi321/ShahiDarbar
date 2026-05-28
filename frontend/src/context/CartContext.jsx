@@ -1,32 +1,141 @@
-import { createContext, useState } from "react"
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+} from "react"
 
-export const CartContext = createContext()
+const CartContext = createContext()
 
-function CartProvider({ children }) {
+export const CartProvider = ({
+  children,
+}) => {
 
-  const [cartItems, setCartItems] = useState([])
+  const [cartCount, setCartCount] =
+    useState(0)
 
-  const addToCart = (product) => {
+  const [isCartOpen, setIsCartOpen] =
+    useState(false)
 
-    setCartItems((prev) => [...prev, product])
+  const [cartItems, setCartItems] =
+    useState([])
 
-  }
+  /* INCREASE QUANTITY */
 
-  const removeFromCart = (id) => {
+const increaseQuantity = (id) => {
 
-    setCartItems(
-      cartItems.filter((item) => item.id !== id)
+  const items =
+    JSON.parse(
+      localStorage.getItem("cartItems")
+    ) || []
+
+  const updatedItems = items.map((item) =>
+
+    item._id === id
+
+      ? {
+          ...item,
+          quantity: item.quantity + 1,
+        }
+
+      : item
+
+  )
+
+  localStorage.setItem(
+    "cartItems",
+    JSON.stringify(updatedItems)
+  )
+
+  updateCart()
+
+}
+
+/* DECREASE QUANTITY */
+
+const decreaseQuantity = (id) => {
+
+  let items =
+    JSON.parse(
+      localStorage.getItem("cartItems")
+    ) || []
+
+  items = items.map((item) =>
+
+    item._id === id
+
+      ? {
+          ...item,
+          quantity: item.quantity - 1,
+        }
+
+      : item
+
+  )
+
+  items = items.filter(
+    (item) => item.quantity > 0
+  )
+
+  localStorage.setItem(
+    "cartItems",
+    JSON.stringify(items)
+  )
+
+  updateCart()
+
+}
+
+  /* UPDATE CART */
+
+  const updateCart = () => {
+
+    const items =
+      JSON.parse(
+        localStorage.getItem("cartItems")
+      ) || []
+  
+    setCartItems([...items])
+  
+    const totalItems = items.reduce(
+  
+      (acc, item) =>
+  
+        acc + item.quantity,
+  
+      0
+  
     )
   
+    setCartCount(totalItems)
+  
   }
+
+  useEffect(() => {
+
+    updateCart()
+
+  }, [])
 
   return (
 
     <CartContext.Provider
-    value={{
+      value={{
+
+        cartCount,
+
         cartItems,
-        addToCart,
-        removeFromCart,
+
+        isCartOpen,
+
+        setIsCartOpen,
+
+        updateCart,
+
+        increaseQuantity,
+
+        decreaseQuantity,
+
       }}
     >
 
@@ -35,6 +144,8 @@ function CartProvider({ children }) {
     </CartContext.Provider>
 
   )
+
 }
 
-export default CartProvider
+export const useCart = () =>
+  useContext(CartContext)
