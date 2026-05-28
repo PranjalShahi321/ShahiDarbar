@@ -17,7 +17,12 @@ connectDB()
 
 const app = express()
 
-app.use(cors())
+app.use(
+  cors({
+    origin: "*",
+    credentials: true,
+  })
+)
 app.use(express.json())
 
 app.use("/api/products", productRoutes)
@@ -32,7 +37,8 @@ app.get("/", (req, res) => {
   res.send("ShahiDarbar API Running")
 })
 
-const PORT = 5000
+const PORT =
+  process.env.PORT || 5000
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
