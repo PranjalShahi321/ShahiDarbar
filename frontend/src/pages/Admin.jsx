@@ -120,7 +120,11 @@ function Admin() {
 
       }
       setLoading(false)
-      alert("Success")
+      toast.success(
+        editingId
+          ? "Product Updated"
+          : "Product Added"
+      )
 
       setName("")
       setPrice("")
@@ -135,7 +139,7 @@ function Admin() {
 
       console.log(error)
 
-      alert("Something Went Wrong")
+      toast.error("Something Went Wrong")
 
       setLoading(false)
 
@@ -156,7 +160,7 @@ function Admin() {
 
       )
 
-      alert("Product Deleted")
+      toast.success("Product Deleted")
 
       fetchProducts()
 
@@ -356,94 +360,113 @@ function Admin() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
 
-          {products
-            .filter(product =>
+          {
+            products.filter(product =>
               product.name
                 .toLowerCase()
                 .includes(search.toLowerCase())
-            )
-            .map((product) => (
+            ).length === 0 ? (
 
-              <div
-                key={product._id}
-                className="bg-white rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition duration-300"
-              >
+              <div className="col-span-full text-center py-20">
 
-                <img
-                  src={product.image}
-                  alt={product.name}
-                  className="w-full h-56 object-cover"
-                />
+                <h2 className="text-3xl font-bold text-gray-500">
 
-                <div className="p-6">
+                  No Products Found
 
-                  <div className="flex justify-between items-start mb-2">
-
-                    <h2 className="text-xl font-bold text-gray-800 line-clamp-1">
-
-                      {product.name}
-
-                    </h2>
-
-                    <span className="bg-green-100 text-green-700 px-2 py-1 rounded-lg text-xs font-semibold">
-
-                      {product.category}
-
-                    </span>
-
-                  </div>
-
-                  <p className="text-green-700 text-2xl font-bold mb-3">
-
-                    ₹{product.price}
-
-                  </p>
-
-                  <p className="text-gray-500 text-sm mb-5 line-clamp-2">
-
-                    {product.description}
-
-                  </p>
-
-                  <div className="flex gap-3">
-
-                    <button
-                      onClick={() => editProduct(product)}
-                      className="flex-1 bg-blue-500 text-white py-2 rounded-xl hover:bg-blue-600 transition"
-                    >
-
-                      Update
-
-                    </button>
-
-                    <button
-                      onClick={() => {
-
-                        if (
-                          window.confirm(
-                            `Delete ${product.name}?`
-                          )
-                        ) {
-
-                          deleteProduct(product._id)
-
-                        }
-
-                      }}
-                      className="flex-1 bg-red-500 text-white py-2 rounded-xl hover:bg-red-600 transition"
-                    >
-
-                      Delete
-
-                    </button>
-
-                  </div>
-
-                </div>
+                </h2>
 
               </div>
 
-            ))}
+            ) : (
+              products
+                .filter(product =>
+                  product.name
+                    .toLowerCase()
+                    .includes(search.toLowerCase())
+                )
+                .map((product) => (
+
+                  <div
+                    key={product._id}
+                    className="bg-white rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition duration-300"
+                  >
+
+                    <img
+                      src={product.image}
+                      alt={product.name}
+                      className="w-full h-56 object-cover"
+                    />
+
+                    <div className="p-6">
+
+                      <div className="flex justify-between items-start mb-2">
+
+                        <h2 className="text-xl font-bold text-gray-800 line-clamp-1">
+
+                          {product.name}
+
+                        </h2>
+
+                        <span className="bg-green-100 text-green-700 px-2 py-1 rounded-lg text-xs font-semibold">
+
+                          {product.category}
+
+                        </span>
+
+                      </div>
+
+                      <p className="text-green-700 text-2xl font-bold mb-3">
+
+                        ₹{product.price}
+
+                      </p>
+
+                      <p className="text-gray-500 text-sm mb-5 line-clamp-2">
+
+                        {product.description}
+
+                      </p>
+
+                      <div className="flex gap-3">
+
+                        <button
+                          onClick={() => editProduct(product)}
+                          className="flex-1 bg-blue-500 text-white py-2 rounded-xl hover:bg-blue-600 transition"
+                        >
+
+                          Update
+
+                        </button>
+
+                        <button
+                          onClick={() => {
+
+                            if (
+                              window.confirm(
+                                `Delete ${product.name}?`
+                              )
+                            ) {
+
+                              deleteProduct(product._id)
+
+                            }
+
+                          }}
+                          className="flex-1 bg-red-500 text-white py-2 rounded-xl hover:bg-red-600 transition"
+                        >
+
+                          Delete
+
+                        </button>
+
+                      </div>
+
+                    </div>
+
+                  </div>
+
+                )))
+          }
 
         </div>
       </div>
