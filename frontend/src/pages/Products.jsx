@@ -32,10 +32,12 @@ function Products() {
         const { data } = await axios.get(
           `${import.meta.env.VITE_API_URL}/api/products`
         )
+        console.log("API DATA:", data)
 
         setProducts(
           Array.isArray(data) ? data : []
         )
+        console.log("Products Loaded")
 
       } catch (error) {
 

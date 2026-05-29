@@ -48,122 +48,95 @@ function Admin() {
   const uploadImage = async () => {
 
     if (!image) return ""
-
+  
     const formData = new FormData()
-
+  
     formData.append("image", image)
-
+  
     try {
-
+  
       const { data } = await axios.post(
-
         `${import.meta.env.VITE_API_URL}/api/upload`,
-
         formData
-
       )
-
-      return data.image
-
+  
+      console.log(data)
+  
+      return data.imageUrl
+  
     } catch (error) {
-
+  
       console.log(error)
-
+  
       return ""
-
+  
     }
-
+  
   }
 
   /* SUBMIT */
 
-  const handleSubmit = async (e) => {
+const handleSubmit = async (e) => {
 
-    e.preventDefault()
+  e.preventDefault()
 
-    try {
+  try {
 
-      let imageUrl = ""
+    let imageUrl = ""
 
-      if (image) {
+    if (image) {
+      imageUrl = await uploadImage()
+    }
 
-        imageUrl = await uploadImage()
+    console.log("IMAGE URL:", imageUrl)
 
-      }
+    const productData = {
+      name,
+      price,
+      category,
+      description,
+      image: imageUrl,
+    }
 
-      const productData = {
+    console.log("PRODUCT DATA:", productData)
 
-        name,
+    if (editingId) {
+      alert(JSON.stringify(productData))
 
-        price,
+      await axios.put(
+        `${import.meta.env.VITE_API_URL}/api/products/${editingId}`,
+        productData
+      )
 
-        category,
+    } else {
 
-        description,
-
-      }
-
-      if (imageUrl) {
-
-        productData.image = imageUrl
-
-      }
-
-      /* UPDATE */
-
-      if (editingId) {
-
-        await axios.put(
-
-          `${import.meta.env.VITE_API_URL}/api/products/${editingId}`,
-
-          productData
-
-        )
-
-        alert("Product Updated")
-
-      }
-
-      /* CREATE */
-
-      else {
-
-        productData.image = imageUrl
-
-        await axios.post(
-
-          `${import.meta.env.VITE_API_URL}/api/products`,
-
-          productData
-
-        )
-
-        alert("Product Added")
-
-      }
-
-      /* RESET */
-
-      setName("")
-      setPrice("")
-      setCategory("")
-      setDescription("")
-      setImage(null)
-
-      setEditingId(null)
-
-      fetchProducts()
-
-    } catch (error) {
-
-      console.log(error)
-
-      alert("Something Went Wrong")
+      await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/products`,
+        productData
+      )
 
     }
 
+    alert("Success")
+
+    setName("")
+    setPrice("")
+    setCategory("")
+    setDescription("")
+    setImage(null)
+    setEditingId(null)
+
+    fetchProducts()
+
+  } catch (error) {
+
+    console.log(error)
+
+    alert("Something Went Wrong")
+
   }
+
+}
 
   /* DELETE */
 

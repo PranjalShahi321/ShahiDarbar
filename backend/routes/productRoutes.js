@@ -51,6 +51,8 @@ router.get("/:id", async (req, res) => {
 router.post("/", async (req, res) => {
 
   try {
+    
+    console.log("REQ BODY:", req.body)
 
     const product = await Product.create(req.body)
 
@@ -58,10 +60,13 @@ router.post("/", async (req, res) => {
 
   } catch (error) {
 
+    console.log("PRODUCT CREATE ERROR:")
+    console.log(error)
+  
     res.status(500).json({
       message: error.message,
     })
-
+  
   }
 
 })
