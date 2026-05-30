@@ -18,15 +18,17 @@ const app = express()
 
 /* CORS */
 
+const cors = require("cors");
+
 app.use(
   cors({
     origin: [
-      "http://localhost:5173",
-      "https://shahi-darbar-six.vercel.app"
+      "https://shahi-darbar-one.vercel.app",
+      "http://localhost:5173"
     ],
     credentials: true,
   })
-)
+);
 
 /* BODY PARSER */
 

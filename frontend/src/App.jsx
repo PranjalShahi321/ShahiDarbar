@@ -14,6 +14,7 @@ import Checkout from "./pages/Checkout"
 import ProductDetails from "./pages/ProductDetails"
 import ProtectedRoute from "./components/ProtectedRoute"
 import Wishlist from "./pages/Wishlist"
+import { Toaster } from "react-hot-toast";
 
 function App() {
 
@@ -23,6 +24,7 @@ function App() {
 
       <Navbar />
       <CartSidebar />
+      <Toaster position="top-right" />
 
       <Routes>
 
