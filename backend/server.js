@@ -18,8 +18,6 @@ const app = express()
 
 /* CORS */
 
-const cors = require("cors");
-
 app.use(
   cors({
     origin: [
@@ -28,7 +26,7 @@ app.use(
     ],
     credentials: true,
   })
-);
+)
 
 /* BODY PARSER */
 
@@ -37,13 +35,9 @@ app.use(express.json())
 /* ROUTES */
 
 app.use("/api/products", productRoutes)
-
 app.use("/api/auth", authRoutes)
-
 app.use("/api/upload", uploadRoutes)
-
 app.use("/api/orders", orderRoutes)
-
 app.use("/api/payment", paymentRoutes)
 
 /* TEST ROUTE */
