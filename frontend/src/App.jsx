@@ -1,36 +1,56 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom"
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  useLocation,
+} from "react-router-dom";
 
-import Navbar from "./components/Navbar"
-import Footer from "./components/Footer"
+import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
+import CartSidebar from "./components/CartSidebar";
 
-import CartSidebar from "./components/CartSidebar"
-import Home from "./pages/Home"
-import Products from "./pages/Products"
-import Cart from "./pages/Cart"
-import Login from "./pages/Login"
-import Register from "./pages/Register"
-import Admin from "./pages/Admin"
-import Checkout from "./pages/Checkout"
-import ProductDetails from "./pages/ProductDetails"
-import ProtectedRoute from "./components/ProtectedRoute"
-import AdminRoute from "./components/AdminRoute"
-import Wishlist from "./pages/Wishlist"
+import Home from "./pages/Home";
+import Products from "./pages/Products";
+import Cart from "./pages/Cart";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import Checkout from "./pages/Checkout";
+import ProductDetails from "./pages/ProductDetails";
+import Wishlist from "./pages/Wishlist";
+
+import ProtectedRoute from "./components/ProtectedRoute";
+import AdminRoute from "./components/AdminRoute";
+
+import AdminDashboard from "./pages/AdminDashboard";
+import AdminProducts from "./pages/AdminProducts";
+import AdminOrders from "./pages/AdminOrders";
+import AdminLayout from "./layouts/AdminLayout";
+
 import { Toaster } from "react-hot-toast";
 
+/* ===========================
+   Layout Wrapper
+=========================== */
 
-function App() {
+function LayoutWrapper() {
+  const location = useLocation();
+
+  const isAdminRoute =
+    location.pathname.startsWith("/admin");
 
   return (
-
-    <BrowserRouter>
-
-      <Navbar />
-      <CartSidebar />
-      <Toaster position="top-right" />
+    <>
+      {!isAdminRoute && <Navbar />}
+      {!isAdminRoute && <CartSidebar />}
 
       <Routes>
 
-        <Route path="/" element={<Home />} />
+        {/* Customer Routes */}
+
+        <Route
+          path="/"
+          element={<Home />}
+        />
 
         <Route
           path="/products"
@@ -42,13 +62,24 @@ function App() {
           element={<ProductDetails />}
         />
 
-        <Route path="/cart" element={<Cart />} />
+        <Route
+          path="/cart"
+          element={<Cart />}
+        />
 
-        <Route path="/login" element={<Login />} />
+        <Route
+          path="/login"
+          element={<Login />}
+        />
 
         <Route
           path="/register"
           element={<Register />}
+        />
+
+        <Route
+          path="/wishlist"
+          element={<Wishlist />}
         />
 
         <Route
@@ -60,28 +91,50 @@ function App() {
           }
         />
 
+        {/* Admin Routes */}
+
         <Route
           path="/admin"
           element={
             <AdminRoute>
-              <Admin />
+              <AdminLayout />
             </AdminRoute>
           }
-        />
+        >
+          <Route
+            index
+            element={<AdminDashboard />}
+          />
 
-        <Route
-          path="/wishlist"
-          element={<Wishlist />}
-        />
+          <Route
+            path="products"
+            element={<AdminProducts />}
+          />
+
+          <Route
+            path="orders"
+            element={<AdminOrders />}
+          />
+        </Route>
 
       </Routes>
 
-      <Footer />
-
-    </BrowserRouter>
-
-  )
-
+      {!isAdminRoute && <Footer />}
+    </>
+  );
 }
 
-export default App
+/* ===========================
+   App
+=========================== */
+
+function App() {
+  return (
+    <BrowserRouter>
+      <Toaster position="top-right" />
+      <LayoutWrapper />
+    </BrowserRouter>
+  );
+}
+
+export default App;
