@@ -35,6 +35,9 @@ function Navbar() {
     setFilteredProducts] =
     useState([])
 
+  const [selectedIndex, setSelectedIndex] =
+    useState(-1)
+
   const [mobileMenu,
     setMobileMenu] =
     useState(false)
@@ -58,6 +61,46 @@ function Navbar() {
 
     navigate("/login")
 
+  }
+  const handleKeyDown = (e) => {
+
+    if (!filteredProducts.length)
+      return
+  
+    if (e.key === "ArrowDown") {
+  
+      e.preventDefault()
+  
+      setSelectedIndex((prev) =>
+        prev < filteredProducts.length - 1
+          ? prev + 1
+          : 0
+      )
+    }
+  
+    if (e.key === "ArrowUp") {
+  
+      e.preventDefault()
+  
+      setSelectedIndex((prev) =>
+        prev > 0
+          ? prev - 1
+          : filteredProducts.length - 1
+      )
+    }
+  
+    if (
+      e.key === "Enter" &&
+      selectedIndex >= 0
+    ) {
+  
+      navigate(
+        `/product/${filteredProducts[selectedIndex]._id}`
+      )
+  
+      setSearch("")
+      setFilteredProducts([])
+    }
   }
 
   /* FETCH PRODUCTS */
@@ -115,6 +158,8 @@ function Navbar() {
         filtered.slice(0, 5)
       )
 
+      setSelectedIndex(-1)
+
     }
 
   }, [search, products])
@@ -170,6 +215,7 @@ function Navbar() {
               onChange={(e) =>
                 setSearch(e.target.value)
               }
+              onKeyDown={handleKeyDown}
               className="
                 border px-4 py-2
                 rounded-xl
@@ -191,7 +237,7 @@ function Navbar() {
                 "
               >
 
-                {filteredProducts.map((product) => (
+                {filteredProducts.map((product , index) => (
 
                   <Link
                     key={product._id}
@@ -203,11 +249,15 @@ function Navbar() {
                       setFilteredProducts([])
 
                     }}
-                    className="
+                    className={`
                       flex items-center gap-4
-                      p-4 hover:bg-gray-100
-                      transition border-b
-                    "
+                      p-4 transition border-b
+                      ${
+                        selectedIndex === index
+                          ? "bg-gray-200"
+                          : "hover:bg-gray-100"
+                      }
+                    `}
                   >
 
                     <img

@@ -13,8 +13,10 @@ import Admin from "./pages/Admin"
 import Checkout from "./pages/Checkout"
 import ProductDetails from "./pages/ProductDetails"
 import ProtectedRoute from "./components/ProtectedRoute"
+import AdminRoute from "./components/AdminRoute"
 import Wishlist from "./pages/Wishlist"
 import { Toaster } from "react-hot-toast";
+
 
 function App() {
 
@@ -50,17 +52,21 @@ function App() {
         />
 
         <Route
-          path="/admin"
+          path="/checkout"
           element={
             <ProtectedRoute>
-              <Admin />
+              <Checkout />
             </ProtectedRoute>
           }
         />
 
         <Route
-          path="/checkout"
-          element={<Checkout />}
+          path="/admin"
+          element={
+            <AdminRoute>
+              <Admin />
+            </AdminRoute>
+          }
         />
 
         <Route

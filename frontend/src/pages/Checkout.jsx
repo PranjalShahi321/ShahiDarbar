@@ -1,20 +1,84 @@
 import { useEffect, useState } from "react"
+import { useNavigate } from "react-router-dom"
 import axios from "axios"
 
 function Checkout() {
 
+  const navigate = useNavigate()
+
   const [cartItems, setCartItems] = useState([])
+  const [customerName, setCustomerName] =
+    useState("")
+
+  const [phone, setPhone] =
+    useState("")
+
+  const [address, setAddress] =
+    useState("")
+
+  const [landmark, setLandmark] =
+    useState("")
+
+  const [loading, setLoading] =
+    useState(false)
+
+  /* LOAD CART */
 
   /* LOAD CART */
 
   useEffect(() => {
 
     const items =
-      JSON.parse(localStorage.getItem("cartItems")) || []
+      JSON.parse(
+        localStorage.getItem("cartItems")
+      ) || []
 
     setCartItems(items)
 
-  }, [])
+    const userInfo =
+      JSON.parse(
+        localStorage.getItem("userInfo")
+      )
+
+    if (userInfo) {
+      setCustomerName(
+        userInfo.name
+      )
+    }
+    const deliveryInfo =
+      JSON.parse(
+        localStorage.getItem(
+          "deliveryInfo"
+        )
+      )
+
+    if (deliveryInfo) {
+
+      setPhone(
+        deliveryInfo.phone || ""
+      )
+
+      setAddress(
+        deliveryInfo.address || ""
+      )
+
+      setLandmark(
+        deliveryInfo.landmark || ""
+      )
+
+    }
+
+    if (items.length === 0) {
+
+      alert("Your cart is empty.")
+
+      navigate("/cart")
+
+    }
+
+  }, [navigate])
+
+
 
   /* TOTAL PRICE */
 
@@ -27,10 +91,50 @@ function Checkout() {
     0
 
   )
+  const deliveryCharge =
+    totalPrice >= 500
+      ? 0
+      : 30
+
+  const finalAmount =
+    totalPrice +
+    deliveryCharge
 
   /* PAYMENT */
 
   const handlePayment = async () => {
+
+    if (
+      !customerName.trim() ||
+      !phone.trim() ||
+      !address.trim()
+    ) {
+      alert(
+        "Please fill all delivery details."
+      )
+      return
+    }
+
+    if (!/^\d{10}$/.test(phone)) {
+      alert(
+        "Please enter a valid mobile number."
+      )
+      return
+    }
+    localStorage.setItem(
+      "deliveryInfo",
+
+      JSON.stringify({
+
+        phone,
+
+        address,
+
+        landmark,
+
+      })
+    )
+    setLoading(true)
 
     try {
 
@@ -39,14 +143,14 @@ function Checkout() {
         `${import.meta.env.VITE_API_URL}/api/payment/create-order`,
 
         {
-          amount: totalPrice,
+          amount: finalAmount,
         }
 
       )
 
       const options = {
 
-        key: "rzp_test_SubpnZ1HTrl2o4",
+        key: "...",
 
         amount: data.amount,
 
@@ -60,11 +164,28 @@ function Checkout() {
 
         handler: async function () {
 
-          alert("Payment Successful")
+          setLoading(false)
 
-          localStorage.removeItem("cartItems")
+          alert(
+            "Payment Successful"
+          )
+
+          localStorage.removeItem(
+            "cartItems"
+          )
 
           window.location.href = "/"
+
+        },
+
+        modal: {
+
+          ondismiss:
+            function () {
+
+              setLoading(false)
+
+            }
 
         },
 
@@ -81,6 +202,8 @@ function Checkout() {
       razor.open()
 
     } catch (error) {
+
+      setLoading(false)
 
       console.log(error)
 
@@ -101,6 +224,18 @@ function Checkout() {
           Checkout
 
         </h1>
+        {
+          customerName && (
+            <p className="
+      text-center
+      text-gray-600
+      text-lg
+      mb-8
+    ">
+              Hi, {customerName} 👋
+            </p>
+          )
+        }
 
         {/* ITEMS */}
 
@@ -151,6 +286,150 @@ function Checkout() {
 
         </div>
 
+        <div className="bg-gray-50 p-6 rounded-2xl mb-10">
+
+          <h2 className="text-3xl font-bold mb-6">
+
+            Delivery Details
+
+          </h2>
+
+          <div className="space-y-5">
+
+            <input
+              type="text"
+              placeholder="Full Name"
+              value={customerName}
+              onChange={(e) =>
+                setCustomerName(e.target.value)
+              }
+              className="
+        w-full
+        border
+        px-5
+        py-4
+        rounded-xl
+        outline-none
+      "
+            />
+
+            <input
+              type="tel"
+              placeholder="Phone Number"
+              value={phone}
+              onChange={(e) =>
+                setPhone(e.target.value)
+              }
+              className="
+        w-full
+        border
+        px-5
+        py-4
+        rounded-xl
+        outline-none
+      "
+            />
+
+            <textarea
+              placeholder="Delivery Address"
+              value={address}
+              onChange={(e) =>
+                setAddress(e.target.value)
+              }
+              rows="3"
+              className="
+        w-full
+        border
+        px-5
+        py-4
+        rounded-xl
+        outline-none
+      "
+            />
+
+            <input
+              type="text"
+              placeholder="Landmark (Optional)"
+              value={landmark}
+              onChange={(e) =>
+                setLandmark(e.target.value)
+              }
+              className="
+        w-full
+        border
+        px-5
+        py-4
+        rounded-xl
+        outline-none
+      "
+            />
+
+          </div>
+
+        </div>
+        <div className="bg-gray-50 p-6 rounded-2xl mb-10">
+
+          <h2 className="text-3xl font-bold mb-6">
+            Order Summary
+          </h2>
+
+          <div className="space-y-4">
+
+            {cartItems.map((item) => (
+
+              <div
+                key={item._id}
+                className="
+          flex
+          justify-between
+          border-b
+          pb-3
+        "
+              >
+
+                <span>
+                  {item.name}
+                  {" "}
+                  ×
+                  {" "}
+                  {item.quantity}
+                </span>
+
+                <span>
+                  ₹
+                  {item.price *
+                    item.quantity}
+                </span>
+
+              </div>
+
+            ))}
+
+            <div
+              className="
+        flex
+        justify-between
+        font-semibold
+      "
+            >
+              <span>
+                Delivery Charges
+              </span>
+
+              <span>
+
+                {
+                  deliveryCharge === 0
+                    ? "FREE"
+                    : `₹${deliveryCharge}`
+                }
+
+              </span>
+            </div>
+
+          </div>
+
+        </div>
         {/* TOTAL */}
 
         <div className="flex justify-between items-center mb-10">
@@ -163,16 +442,38 @@ function Checkout() {
 
           <h2 className="text-4xl font-bold text-green-700">
 
-            ₹{totalPrice}
+            ₹{finalAmount}
 
           </h2>
 
         </div>
 
+        {
+          deliveryCharge > 0 && (
+
+            <p
+              className="
+        text-center
+        text-gray-600
+        mb-5
+      "
+            >
+
+              Add ₹
+              {500 - totalPrice}
+              more items to get
+              FREE delivery 🚚
+
+            </p>
+
+          )
+        }
+
         {/* BUTTON */}
 
         <button
           onClick={handlePayment}
+          disabled={loading}
           className="w-full bg-green-600 text-white py-5 rounded-2xl text-2xl font-bold hover:bg-green-700"
         >
 
