@@ -134,6 +134,11 @@ function Checkout() {
 
       })
     )
+    const userInfo = JSON.parse(
+      localStorage.getItem("userInfo")
+    );
+    
+    const token = userInfo?.token;
     setLoading(true)
 
     try {
@@ -150,8 +155,7 @@ function Checkout() {
 
       const options = {
 
-        key: "...",
-
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
         amount: data.amount,
 
         currency: data.currency,
@@ -162,20 +166,69 @@ function Checkout() {
 
         order_id: data.id,
 
-        handler: async function () {
-
-          setLoading(false)
-
-          alert(
-            "Payment Successful"
-          )
-
-          localStorage.removeItem(
-            "cartItems"
-          )
-
-          window.location.href = "/"
-
+        handler: async function (response) {
+          try {
+            await axios.post(
+              `${import.meta.env.VITE_API_URL}/api/orders`,
+              {
+                customerName,
+                phone,
+                address:
+                  address +
+                  (landmark
+                    ? `, Landmark: ${landmark}`
+                    : ""),
+        
+                products: cartItems.map(
+                  (item) => ({
+                    product: item._id,
+                    name: item.name,
+                    price: item.price,
+                    quantity: item.quantity,
+                    image: item.image,
+                  })
+                ),
+        
+                subtotal: totalPrice,
+                deliveryCharge,
+                totalAmount: finalAmount,
+        
+                paymentStatus: "Paid",
+        
+                razorpayOrderId:
+                  response.razorpay_order_id,
+        
+                razorpayPaymentId:
+                  response.razorpay_payment_id,
+              },
+              {
+                headers: {
+                  Authorization:
+                    `Bearer ${token}`,
+                },
+              }
+            );
+        
+            setLoading(false);
+        
+            alert(
+              "Payment Successful"
+            );
+        
+            localStorage.removeItem(
+              "cartItems"
+            );
+        
+            window.location.href = "/";
+          } catch (error) {
+            console.log(error);
+        
+            setLoading(false);
+        
+            alert(
+              "Payment successful but order could not be saved."
+            );
+          }
         },
 
         modal: {

@@ -3,6 +3,14 @@ import Razorpay from "razorpay"
 
 const router = express.Router()
 
+console.log(
+  process.env.RAZORPAY_KEY_ID
+);
+
+console.log(
+  process.env.RAZORPAY_KEY_SECRET
+);
+
 const razorpay = new Razorpay({
 
   key_id: process.env.RAZORPAY_KEY_ID,
@@ -34,13 +42,14 @@ router.post("/create-order", async (req, res) => {
     res.json(order)
 
   } catch (error) {
-
+    console.log("RAZORPAY ERROR:");
+    console.log(error);
+  
     res.status(500).json({
+      success: false,
       message: error.message,
-    })
-
+    });
   }
-
 })
 
 export default router

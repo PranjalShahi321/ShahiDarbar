@@ -1,47 +1,43 @@
-import express from "express"
+import express from "express";
 
-import Order from "../models/Order.js"
+import {
+  createOrder,
+  getOrders,
+  getMyOrders,
+  updateOrderStatus,
+} from "../controllers/orderController.js";
 
-const router = express.Router()
+import {
+  protect,
+  admin,
+} from "../middleware/authMiddleware.js";
 
-/* CREATE ORDER */
+const router = express.Router();
 
-router.post("/", async (req, res) => {
+/* CUSTOMER */
 
-  try {
+router.post("/", protect, createOrder);
 
-    const order = await Order.create(req.body)
+router.get(
+  "/my-orders",
+  protect,
+  getMyOrders
+);
 
-    res.status(201).json(order)
+/* ADMIN */
 
-  } catch (error) {
+router.get(
+  "/",
+  protect,
+  admin,
+  getOrders
+);
 
-    res.status(500).json({
-      message: error.message,
-    })
+router.put(
+  "/:id",
+  protect,
+  admin,
+  updateOrderStatus
+);
 
-  }
-
-})
-
-/* GET ORDERS */
-
-router.get("/", async (req, res) => {
-
-  try {
-
-    const orders = await Order.find()
-
-    res.json(orders)
-
-  } catch (error) {
-
-    res.status(500).json({
-      message: error.message,
-    })
-
-  }
-
-})
-
-export default router
+export default router;
