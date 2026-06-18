@@ -4,6 +4,7 @@ import {
   getMyOrders,
   getAllOrders,
   updateOrderStatus,
+  verifyPayment,
 } from "../controllers/orderController.js";
 
 import {
@@ -12,6 +13,19 @@ import {
 } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
+
+router.get("/test", (req, res) => {
+  res.json({
+    success: true,
+    message: "Orders route working",
+  });
+});
+
+router.post(
+  "/verify-payment",
+  protect,
+  verifyPayment
+);
 
 router.post("/", protect, createOrder);
 
