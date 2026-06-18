@@ -1,55 +1,50 @@
-import dotenv from "dotenv"
-dotenv.config()
+import dotenv from "dotenv";
+dotenv.config();
 
-import express from "express"
-import cors from "cors"
+import express from "express";
+import cors from "cors";
 
-import connectDB from "./config/db.js"
+import connectDB from "./config/db.js";
 
-import productRoutes from "./routes/productRoutes.js"
-import authRoutes from "./routes/authRoutes.js"
-import uploadRoutes from "./routes/uploadRoutes.js"
-import orderRoutes from "./routes/orderRoutes.js"
-import paymentRoutes from "./routes/paymentRoutes.js"
+import productRoutes from "./routes/productRoutes.js";
+import authRoutes from "./routes/authRoutes.js";
+import uploadRoutes from "./routes/uploadRoutes.js";
+import orderRoutes from "./routes/orderRoutes.js";
+import paymentRoutes from "./routes/paymentRoutes.js";
 
-connectDB()
+connectDB();
 
-const app = express()
+const app = express();
 
 /* CORS */
-
 app.use(
   cors({
     origin: [
       "https://shahi-darbar-one.vercel.app",
-      "http://localhost:5173"
+      "http://localhost:5173",
     ],
     credentials: true,
   })
-)
+);
 
 /* BODY PARSER */
-
-app.use(express.json())
+app.use(express.json());
 
 /* ROUTES */
-
-app.use("/api/products", productRoutes)
-app.use("/api/auth", authRoutes)
-app.use("/api/upload", uploadRoutes)
-app.use("/api/orders", orderRoutes)
-app.use("/api/payment", paymentRoutes)
+app.use("/api/products", productRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/upload", uploadRoutes);
+app.use("/api/orders", orderRoutes);
+app.use("/api/payment", paymentRoutes);
 
 /* TEST ROUTE */
-
 app.get("/", (req, res) => {
-  res.send("ShahiDarbar API Running")
-})
+  res.send("ShahiDarbar API Running");
+});
 
 /* SERVER */
-
-const PORT = process.env.PORT || 5000
+const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`)
-})
+  console.log(`Server running on port ${PORT}`);
+});

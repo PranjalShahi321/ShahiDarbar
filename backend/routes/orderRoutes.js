@@ -1,9 +1,8 @@
 import express from "express";
-
 import {
   createOrder,
-  getOrders,
   getMyOrders,
+  getAllOrders,
   updateOrderStatus,
 } from "../controllers/orderController.js";
 
@@ -14,27 +13,19 @@ import {
 
 const router = express.Router();
 
-/* CUSTOMER */
-
 router.post("/", protect, createOrder);
 
-router.get(
-  "/my-orders",
-  protect,
-  getMyOrders
-);
-
-/* ADMIN */
+router.get("/myorders", protect, getMyOrders);
 
 router.get(
-  "/",
+  "/admin",
   protect,
   admin,
-  getOrders
+  getAllOrders
 );
 
 router.put(
-  "/:id",
+  "/admin/:id",
   protect,
   admin,
   updateOrderStatus

@@ -94,7 +94,7 @@ function Checkout() {
   const deliveryCharge =
     totalPrice >= 500
       ? 0
-      : 30
+      : 1
 
   const finalAmount =
     totalPrice +
@@ -137,7 +137,7 @@ function Checkout() {
     const userInfo = JSON.parse(
       localStorage.getItem("userInfo")
     );
-    
+
     const token = userInfo?.token;
     setLoading(true)
 
@@ -168,6 +168,33 @@ function Checkout() {
 
         handler: async function (response) {
           try {
+        
+            // STEP 1 : Verify Payment
+            const verify = await axios.post(
+              `${import.meta.env.VITE_API_URL}/api/orders/verify-payment`,
+              {
+                razorpay_order_id:
+                  response.razorpay_order_id,
+        
+                razorpay_payment_id:
+                  response.razorpay_payment_id,
+        
+                razorpay_signature:
+                  response.razorpay_signature,
+              },
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
+              }
+            );
+        
+            // STEP 2 : Save order only if verified
+            if (!verify.data.success) {
+              alert("Payment verification failed.");
+              return;
+            }
+        
             await axios.post(
               `${import.meta.env.VITE_API_URL}/api/orders`,
               {
@@ -211,15 +238,12 @@ function Checkout() {
         
             setLoading(false);
         
-            alert(
-              "Payment Successful"
-            );
+            alert("Payment Successful");
         
-            localStorage.removeItem(
-              "cartItems"
-            );
+            localStorage.removeItem("cartItems");
         
-            window.location.href = "/";
+            navigate("/my-orders");
+        
           } catch (error) {
             console.log(error);
         

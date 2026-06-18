@@ -26,6 +26,7 @@ import AdminProducts from "./pages/AdminProducts";
 import AdminOrders from "./pages/AdminOrders";
 import AdminLayout from "./layouts/AdminLayout";
 
+import MyOrders from "./pages/MyOrders";
 import { Toaster } from "react-hot-toast";
 
 /* ===========================
@@ -91,6 +92,11 @@ function LayoutWrapper() {
           }
         />
 
+        <Route
+          path="/my-orders"
+          element={<MyOrders />}
+        />
+
         {/* Admin Routes */}
 
         <Route
@@ -109,6 +115,11 @@ function LayoutWrapper() {
           <Route
             path="products"
             element={<AdminProducts />}
+          />
+
+          <Route
+            path="/admin/orders"
+            element={<AdminOrders />}
           />
 
           <Route

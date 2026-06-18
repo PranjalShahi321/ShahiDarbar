@@ -16,7 +16,7 @@ function DashboardCards({
       orders.filter(
         (o) =>
           o.orderStatus ===
-          "Pending"
+          "Processing"
       ).length;
   
     return (
