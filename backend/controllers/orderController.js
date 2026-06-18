@@ -1,4 +1,44 @@
 import Order from "../models/orderModel.js";
+import crypto from "crypto";
+
+// export const verifyPayment = async (req, res) => {
+//   try {
+//     const {
+//       razorpay_order_id,
+//       razorpay_payment_id,
+//       razorpay_signature,
+//     } = req.body;
+
+//     const sign = crypto
+//       .createHmac(
+//         "sha256",
+//         process.env.RAZORPAY_KEY_SECRET
+//       )
+//       .update(
+//         razorpay_order_id +
+//           "|" +
+//           razorpay_payment_id
+//       )
+//       .digest("hex");
+
+//     if (sign !== razorpay_signature) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "Payment verification failed",
+//       });
+//     }
+
+//     res.json({
+//       success: true,
+//       message: "Payment verified",
+//     });
+//   } catch (error) {
+//     res.status(500).json({
+//       success: false,
+//       message: error.message,
+//     });
+//   }
+// };
 
 export const createOrder = async (req, res) => {
   try {

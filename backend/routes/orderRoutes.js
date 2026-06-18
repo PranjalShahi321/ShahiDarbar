@@ -4,7 +4,6 @@ import {
   getMyOrders,
   getAllOrders,
   updateOrderStatus,
-  verifyPayment,
 } from "../controllers/orderController.js";
 
 import {
@@ -21,11 +20,6 @@ router.get("/test", (req, res) => {
   });
 });
 
-router.post(
-  "/verify-payment",
-  protect,
-  verifyPayment
-);
 
 router.post("/", protect, createOrder);
 

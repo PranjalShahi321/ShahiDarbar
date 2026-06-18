@@ -169,32 +169,6 @@ function Checkout() {
         handler: async function (response) {
           try {
         
-            // STEP 1 : Verify Payment
-            const verify = await axios.post(
-              `${import.meta.env.VITE_API_URL}/api/orders/verify-payment`,
-              {
-                razorpay_order_id:
-                  response.razorpay_order_id,
-        
-                razorpay_payment_id:
-                  response.razorpay_payment_id,
-        
-                razorpay_signature:
-                  response.razorpay_signature,
-              },
-              {
-                headers: {
-                  Authorization: `Bearer ${token}`,
-                },
-              }
-            );
-        
-            // STEP 2 : Save order only if verified
-            if (!verify.data.success) {
-              alert("Payment verification failed.");
-              return;
-            }
-        
             await axios.post(
               `${import.meta.env.VITE_API_URL}/api/orders`,
               {
@@ -236,25 +210,19 @@ function Checkout() {
               }
             );
         
-            setLoading(false);
+            localStorage.removeItem("cartItems");
         
             alert("Payment Successful");
-        
-            localStorage.removeItem("cartItems");
         
             navigate("/my-orders");
         
           } catch (error) {
             console.log(error);
-        
-            setLoading(false);
-        
             alert(
               "Payment successful but order could not be saved."
             );
           }
         },
-
         modal: {
 
           ondismiss:
